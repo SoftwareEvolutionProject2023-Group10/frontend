@@ -1,5 +1,7 @@
 # Home Assistant Frontend
 
+> Group 10 - Frontend repo
+
 This is the repository for the official [Home Assistant](https://home-assistant.io) frontend.
 
 [![Screenshot of the frontend](https://raw.githubusercontent.com/home-assistant/frontend/master/docs/screenshot.png)](https://demo.home-assistant.io/)
