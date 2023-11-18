@@ -24,6 +24,7 @@ const cardConfigStruct = assign(
     hold_action: optional(actionConfigStruct),
     theme: optional(string()),
     show_state: optional(boolean()),
+    condition: optional(string()),
   })
 );
 
@@ -70,6 +71,10 @@ const SCHEMA = [
   {
     name: "hold_action",
     selector: { ui_action: {} },
+  },
+  {
+    name: "condition",
+    selector: { text: {} },
   },
 ] as const;
 
@@ -146,6 +151,8 @@ export class HuiButtonCardEditor
         )} (${this.hass!.localize(
           "ui.panel.lovelace.editor.card.config.optional"
         )})`;
+      case "condition":
+        return "Condition";
       default:
         return this.hass!.localize(
           `ui.panel.lovelace.editor.card.generic.${schema.name}`
