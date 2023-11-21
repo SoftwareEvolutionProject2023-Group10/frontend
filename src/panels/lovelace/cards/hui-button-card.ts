@@ -87,6 +87,31 @@ export class HuiButtonCard extends LitElement implements LovelaceCard {
 
   public hass!: HomeAssistant;
 
+  handleCustomEvent(event: any) {
+    const responseData = event.data; // This contains the response data from the backend
+    console.log("Response from backend:", responseData);
+
+    // Assuming responseData contains a color property
+    const colorFromResponse = responseData;
+
+    if (colorFromResponse) {
+      let rgbArr = colorFromResponse.rgb;
+
+      console.log(colorFromResponse);
+      this.dynamicBackgroundColor = `rgb(${rgbArr[0]},${rgbArr[1]},${rgbArr[2]})`;
+    }
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    this.hass.connection.subscribeEvents(
+      this.handleCustomEvent.bind(this),
+      "custom_event"
+    );
+  }
+
+  @state() private dynamicBackgroundColor = "rgb(2, 255, 255)"; // Default color
+
   @state() private _config?: ButtonCardConfig;
 
   @consume<any>({ context: statesContext, subscribe: true })
@@ -203,6 +228,12 @@ export class HuiButtonCard extends LitElement implements LovelaceCard {
           hasAction(this._config.tap_action) ? "0" : undefined
         )}
       >
+        <div
+          class="rgbcol"
+          style=${styleMap({ backgroundColor: this.dynamicBackgroundColor })}
+        >
+          LIGHT
+        </div>
         ${this._config.show_icon
           ? html`
               <ha-state-icon
@@ -332,6 +363,10 @@ export class HuiButtonCard extends LitElement implements LovelaceCard {
         .state {
           font-size: 0.9rem;
           color: var(--secondary-text-color);
+        }
+
+        .rgbcol {
+          width: 80px;
         }
       `,
     ];
