@@ -89,10 +89,8 @@ export class HuiButtonCard extends LitElement implements LovelaceCard {
 
   handleCustomEvent(event: any) {
     const responseData = event.data; // This contains the response data from the backend
-    console.log("Response from backend:", responseData);
-
     if (responseData.rgb) {
-      let rgbArr = responseData.rgb;
+      const rgbArr = responseData.rgb;
 
       this.bulbBackground = `rgb(${rgbArr[0]},${rgbArr[1]},${rgbArr[2]})`;
       this.weatherCondition = responseData.condition;
@@ -109,13 +107,14 @@ export class HuiButtonCard extends LitElement implements LovelaceCard {
 
   async handleChangeWeatherState() {
     if (this._config?.condition) {
-      await this.hass.callService("template", "weather_service", {
+      await this.hass.callService("weather_light_switch", "weather_service", {
         main: this._config?.condition,
       });
     }
   }
 
-  @state() private bulbBackground = "rgb(128,128,128)";
+  @state() private bulbBackground = "rgb(68, 115, 158)";
+
   @state() private weatherCondition = "";
 
   @state() private _config?: ButtonCardConfig;
@@ -214,7 +213,7 @@ export class HuiButtonCard extends LitElement implements LovelaceCard {
     const colored = stateObj && this.getStateColor(stateObj, this._config);
 
     return html`
-      <div>
+      <div class="hc-b-style">
         <button @click=${this.handleChangeWeatherState}>
           Change weather condition manually
         </button>
@@ -251,7 +250,7 @@ export class HuiButtonCard extends LitElement implements LovelaceCard {
               : "No collected weather condition"}
           </h4>
           <h4>
-            ${this.bulbBackground === "rgb(128,128,128)"
+            ${this.bulbBackground === "rgb(68, 115, 158)"
               ? "STATE: OFF"
               : `STATE: ON with ${this.bulbBackground}`}
           </h4>
@@ -389,6 +388,30 @@ export class HuiButtonCard extends LitElement implements LovelaceCard {
 
         .rgbcol {
           width: 80px;
+        }
+
+        .hc-b-style button {
+          display: inline-block;
+          padding: 10px 20px;
+          font-size: 16px;
+          font-weight: bold;
+          text-align: center;
+          text-decoration: none;
+          cursor: pointer;
+          border: 2px solid #3498db;
+          color: #3498db;
+          background-color: #ffffff;
+          border-radius: 5px;
+          transition:
+            background-color 0.3s,
+            color 0.3s,
+            border-color 0.3s;
+        }
+
+        .hc-b-style button:hover {
+          background-color: #3498db;
+          color: #ffffff;
+          border-color: #ffffff;
         }
       `,
     ];
