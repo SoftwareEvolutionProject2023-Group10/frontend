@@ -201,7 +201,7 @@ export class HuiButtonCard extends LitElement implements LovelaceCard {
           RAINY
         </button>
         <button @click=${() => this.handleChangeWeatherState("cloudy")}>
-          CLOUDY ssss
+          CLOUDY
         </button>
         <button @click=${() => this.handleChangeWeatherState("sunny")}>
           SUNNY
