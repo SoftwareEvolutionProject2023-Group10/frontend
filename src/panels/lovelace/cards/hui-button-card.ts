@@ -87,33 +87,13 @@ export class HuiButtonCard extends LitElement implements LovelaceCard {
 
   public hass!: HomeAssistant;
 
-  handleCustomEvent(event: any) {
-    const responseData = event.data; // This contains the response data from the backend
-    if (responseData.rgb) {
-      const rgbArr = responseData.rgb;
+  async handleChangeWeatherState(weatherType: string) {
+    const entityId = "weather.smhi_weather";
 
-      this.bulbBackground = `rgb(${rgbArr[0]},${rgbArr[1]},${rgbArr[2]})`;
-      this.weatherCondition = responseData.condition;
-    }
+    await this.hass.callApi("POST", "states/" + entityId, {
+      state: weatherType,
+    });
   }
-
-  connectedCallback() {
-    super.connectedCallback();
-    this.hass.connection.subscribeEvents(
-      this.handleCustomEvent.bind(this),
-      "rgb_event"
-    );
-  }
-
-  async handleChangeWeatherState() {
-    if (this._config?.condition) {
-      await this.hass.callService("weather_light_switch", "weather_service", {
-        main: this._config?.condition,
-      });
-    }
-  }
-
-  @state() private bulbBackground = "rgb(68, 115, 158)";
 
   @state() private weatherCondition = "";
 
@@ -214,8 +194,17 @@ export class HuiButtonCard extends LitElement implements LovelaceCard {
 
     return html`
       <div class="hc-b-style">
-        <button @click=${this.handleChangeWeatherState}>
-          Change weather condition manually
+        <button @click=${() => this.handleChangeWeatherState("windy")}>
+          WINDY
+        </button>
+        <button @click=${() => this.handleChangeWeatherState("rainy")}>
+          RAINY
+        </button>
+        <button @click=${() => this.handleChangeWeatherState("cloudy")}>
+          CLOUDY ssss
+        </button>
+        <button @click=${() => this.handleChangeWeatherState("sunny")}>
+          SUNNY
         </button>
       </div>
       <ha-card
@@ -238,23 +227,6 @@ export class HuiButtonCard extends LitElement implements LovelaceCard {
           hasAction(this._config.tap_action) ? "0" : undefined
         )}
       >
-        <div class="lampStyle" style=${styleMap({})}>
-          <p>
-            ${this._config.condition
-              ? `HC condition: ${this._config.condition}`
-              : "No hardcoded condition"}
-          </p>
-          <h4>
-            ${this.weatherCondition
-              ? `Weathercondition: ${this.weatherCondition}`
-              : "No collected weather condition"}
-          </h4>
-          <h4>
-            ${this.bulbBackground === "rgb(68, 115, 158)"
-              ? "STATE: OFF"
-              : `STATE: ON with ${this.bulbBackground}`}
-          </h4>
-        </div>
         ${this._config.show_icon
           ? html`
               <ha-state-icon
@@ -266,7 +238,7 @@ export class HuiButtonCard extends LitElement implements LovelaceCard {
                 .icon=${this._config.icon}
                 .state=${stateObj}
                 style=${styleMap({
-                  color: this.bulbBackground,
+                  color: colored ? this._computeColor(stateObj) : undefined,
                   filter: colored ? stateColorBrightness(stateObj) : undefined,
                   height: this._config.icon_height
                     ? this._config.icon_height
