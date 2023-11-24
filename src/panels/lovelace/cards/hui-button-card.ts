@@ -87,6 +87,16 @@ export class HuiButtonCard extends LitElement implements LovelaceCard {
 
   public hass!: HomeAssistant;
 
+  async handleChangeWeatherState(weatherType: string) {
+    const entityId = "weather.smhi_weather";
+
+    await this.hass.callApi("POST", "states/" + entityId, {
+      state: weatherType,
+    });
+  }
+
+  @state() private weatherCondition = "";
+
   @state() private _config?: ButtonCardConfig;
 
   @consume<any>({ context: statesContext, subscribe: true })
@@ -183,6 +193,20 @@ export class HuiButtonCard extends LitElement implements LovelaceCard {
     const colored = stateObj && this.getStateColor(stateObj, this._config);
 
     return html`
+      <div class="hc-b-style">
+        <button @click=${() => this.handleChangeWeatherState("windy")}>
+          WINDY
+        </button>
+        <button @click=${() => this.handleChangeWeatherState("rainy")}>
+          RAINY
+        </button>
+        <button @click=${() => this.handleChangeWeatherState("cloudy")}>
+          CLOUDY
+        </button>
+        <button @click=${() => this.handleChangeWeatherState("sunny")}>
+          SUNNY
+        </button>
+      </div>
       <ha-card
         @action=${this._handleAction}
         @focus=${this.handleRippleFocus}
@@ -332,6 +356,34 @@ export class HuiButtonCard extends LitElement implements LovelaceCard {
         .state {
           font-size: 0.9rem;
           color: var(--secondary-text-color);
+        }
+
+        .rgbcol {
+          width: 80px;
+        }
+
+        .hc-b-style button {
+          display: inline-block;
+          padding: 10px 20px;
+          font-size: 16px;
+          font-weight: bold;
+          text-align: center;
+          text-decoration: none;
+          cursor: pointer;
+          border: 2px solid #3498db;
+          color: #3498db;
+          background-color: #ffffff;
+          border-radius: 5px;
+          transition:
+            background-color 0.3s,
+            color 0.3s,
+            border-color 0.3s;
+        }
+
+        .hc-b-style button:hover {
+          background-color: #3498db;
+          color: #ffffff;
+          border-color: #ffffff;
         }
       `,
     ];
